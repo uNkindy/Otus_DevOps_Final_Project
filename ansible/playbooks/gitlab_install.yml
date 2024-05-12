@@ -1,0 +1,48 @@
+---
+- name: Gitlab Install
+  become: true
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Make directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - /srv/gitlab/config
+        - /srv/gitlab/data
+        - /srv/gitlab/logs
+
+    - name: Template compose file to host
+      template:
+        src:  templates/docker-compose.j2
+        dest: /srv/gitlab/docker-compose.yml
+
+    - name: Start GitLab
+      community.docker.docker_compose_v2:
+        project_src: /srv/gitlab
+        state: present
+
+    - name: Download foo.conf
+      get_url:
+        url: https://s3.dualstack.us-east-1.amazonaws.com/gitlab-runner-downloads/latest/deb/gitlab-runner_amd64.deb
+        dest: /tmp/gitlab-runner_amd64.deb
+        mode: '0777'
+
+    - name: Install a .deb package
+      apt:
+        deb: /tmp/gitlab-runner_amd64.deb
+        
+
+    
+
+    # - name: Pull and run gitlab runner
+    #   community.docker.docker_container:
+    #     name: gitlab-runner
+    #     image: gitlab/gitlab-runner:latest
+    #     state: started
+    #     volumes:
+    #       - /srv/gitlabrunner/config:/etc/gitlab-runner
+    #       - /var/run/docker.sock:/var/run/docker.sock
+    #     detach: true
+    #     restart: true 

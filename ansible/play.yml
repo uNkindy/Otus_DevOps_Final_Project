@@ -1,0 +1,9 @@
+---
+#  - import_playbook: playbooks/preinstall.yml
+#  - import_playbook: playbooks/docker_install.yml
+#  - import_playbook: playbooks/gitlab_install.yml
+ - import_playbook: playbooks/kubectl_helm_install.yml
+ - import_playbook: playbooks/yc_install.yml
+ - import_playbook: playbooks/postinstall.yml
+
+

@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+ name: kube-state-ingress
+ namespace: monitoring
+spec:
+ ingressClassName: nginx
+ rules:
+  - host: grafana.158.160.131.250.nip.io
+    http:
+     paths:
+      - path: "/"
+        pathType: Prefix
+        backend:
+         service:
+          name: kube-prom-stack-grafana
+          port:
+           number: 80
+
+

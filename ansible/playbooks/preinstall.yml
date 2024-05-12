@@ -1,0 +1,26 @@
+---
+- name: Update and install needed soft
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Update VM
+      apt:
+        update_cache: yes
+        upgrade: "full"
+
+    - name: Install Soft for GitLab
+      apt:
+        name:
+          - curl
+          - openssh-server
+          - ca-certificates
+          - apt-transport-https
+          # - tzdata
+          # - perl
+          - snapd
+          - nodejs
+          - npm
+          # - postfix
+        state: present
+

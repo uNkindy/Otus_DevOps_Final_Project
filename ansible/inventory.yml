@@ -1,0 +1,8 @@
+---
+all:
+  vars:
+    master_host: 158.160.122.218
+
+  hosts:
+    gitlab:
+        ansible_host: 158.160.122.218

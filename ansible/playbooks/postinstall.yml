@@ -1,0 +1,10 @@
+---
+- name: Update and install needed soft
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks: 
+    - name: IP address GitLab
+      debug:
+        msg: "Gitlab IP: http://{{ master_host }}"

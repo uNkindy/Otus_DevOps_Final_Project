@@ -1,0 +1,24 @@
+---
+- name: Install YC kubectl helm
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Install kubectl
+      snap:
+        name:
+          - kubectl
+          - helm
+        classic: true
+
+    - name: Make kubectl config directory
+      file:
+        path: /home/ubuntu/.kube
+        state: directory
+
+    - name: Copy kubectl config
+      copy:
+        src: files/config
+        dest: /home/ubuntu/.kube/config
+

@@ -1,0 +1,40 @@
+---
+- name: Install Docker Engine
+  become: true
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Add gpg key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Repo
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+
+    - name: Update Repos
+      apt:
+        update_cache: yes
+
+    - name: Install Docker Engine
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+          - python3-pip
+        state: present
+
+    - name: Add group docker
+      user:
+        name: "{{ ansible_user_id }}"
+        group: docker
+
+    - name: Install pip module for docker
+      pip:
+        name:
+          - docker-py

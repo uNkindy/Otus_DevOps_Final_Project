@@ -1,0 +1,39 @@
+version: '3'
+
+tasks:
+  default:
+    cmds:
+      - task --list
+
+  init:
+    desc: "Инициализация провайдеров Terraform"
+    dir: terraform
+    cmds:
+      - terraform init
+
+  deploy_vm:
+    desc: "Деплой ВМ в YC"
+    dir: terraform
+    cmds:
+      - terraform apply --auto-approve
+
+  deploy_gitlab:
+    desc: "Деплой gitlab"
+    cmds:
+      - task: init
+      - task: deploy_vm
+      - sleep 30
+      - task: deploy_ansible
+
+  deploy_ansible:
+    desc: "Разворачивание приложений из плейбуков ansible"
+    dir: ansible
+    cmds:
+      - ansible-playbook play.yml
+
+  destroy:
+    desc: "Удаление проекта"
+    dir: terraform
+    cmds:
+      - terraform destroy --auto-approve
+      - rm -rf .terraform .terraform.lock.hcl terraform.tfstate terraform.tfstate.backup

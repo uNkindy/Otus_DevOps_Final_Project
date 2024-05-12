@@ -1,0 +1,19 @@
+---
+- name: Install YC CLI and copy config
+  hosts: all
+  remote_user: ubuntu
+  gather_facts: false
+
+  tasks:
+    - name: Copy yc.sh
+      copy:
+        src:  files/yc.sh
+        dest: /tmp/yc.sh
+        
+    - name: Install YC
+      shell: bash /tmp/yc.sh
+    
+    - name: Copy YC config
+      copy:
+        src: files/config.yaml
+        dest: /home/ubuntu/.config/yandex-cloud/config.yaml
