@@ -21,3 +21,5 @@ sudo docker exec -it docker-runner gitlab-runner register \
 
 
  VzJGqFp2LYNfxctS9/b/zfzWOrNpNSB6PbRSrFzvLMA=
+
+ helm upgrade --install --namespace monitoring logging grafana/loki -f helm/kube-prometheus-stack/values_minio.yaml --set loki.auth_enabled=false --set loki.useTestSchema=true
