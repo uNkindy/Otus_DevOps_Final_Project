@@ -1,7 +1,7 @@
 current: default
 profiles:
   default:
-    token: y0_AgAAAAABM4BOAATuwQAAAAD16T7xXT5VqeGFRm6vVexZFqkCSAWMJoA
-    cloud-id: b1gt222tjoecbt02imcv
+    token: 
+    cloud-id: 
     folder-id: b1g7ordpl05jro479gav
     compute-default-zone: ru-central1-a
