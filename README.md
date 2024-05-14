@@ -1,25 +1,67 @@
-sudo docker exec -it 0d78cf63e9b1 cat /etc/gitlab/initial_root_password
+### Final Progect for Otus Otus DevOps Courses
+___
 
-sudo docker exec -it  /bin/bash
-cat /etc/gitlab/initial_root_password
+#### Данный репозиторий создан для автоматизации разворачивания инфрастурктуры в целях выполнения финального проекта по курсу DevOps
 
-sudo docker run -d --name gitlab-runner --restart always -v /srv/gitlabrunner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner:latest
+___
 
-sudo docker exec -it docker-runner gitlab-runner register \
- --url http://158.160.120.38/ \
- --non-interactive \
- --locked=false \
- --name DockerRunner \
- --executor shell \
- --docker-image alpine:latest \
- --registration-token GR1348941KLtCPA9vcAPHeEKdN-zz \
- --tag-list "linux,xenial,ubuntu,docker" \
- --run-untagged
+1. Описание стенда
 
+Стенд состоит из следующих частей:
+- YC облако с настроенным кластером Kubernetes
+- ВМ, расположенная в YC
 
- ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDTdeHy0cPddPZyfhd1ClMhxbjPYzH6UtK3f0vkm4fqpBUcw0iNPuvbg+wn5Uv/+p8+hJaOoiq4eJUplHEE/l+yt1TqiO4AP8JLFAr60RoIrrBdJSQESj5s8hL3XWdkP0MghkkYVTzdfgD6vb/Ji24SEeiqiqZVoqd6yFHm593tRV1fk1VQ1To9ZjtpjCfCZH4tnnpvfrQ980SVczYrjFQ+W2tc3Zu5U8fMTzV+f6Xh6r1b01pU+m3tobVXgznaCInOnDzej4iJ1IJ95tMoJ5QNTOXa9M81S5YVGTUHAOG/U0OgH+jaT3Q4QS/iyRI5VJ2gngRKp3RJaOSxBGcyLIdAG/1eOcx20KD4KG5RrrsHDbKueeqJmcD3jiLWB4qVSlBmcSrGzI2RyTNDSg4JEygVx32YPQtaC6o0u5eUOeB7XGT43qknm3PygwJwujGmK02/+dfWC+bhju0DxQxffhj7LmLKwTQp2zPlevEca76CwP/DsIi5Oij/BpqmpkwedKk= kita@server
+Стенд автоматизирует разворачивание ВМ в YC, устанавливает необходимое ПО для выполнения финального проекта
 
+2. Требования для разворачивания стенда
+- git
+- task
+- ansible
+- terraform
+- kubectl
+- helm
 
- VzJGqFp2LYNfxctS9/b/zfzWOrNpNSB6PbRSrFzvLMA=
+3. Запуск деплоя стенда в YC
+Запуск оптимизирован при помощи утилиты Task. Для деплоя приложения необходимо выполнить команду:
+
+```console
+git clone <repo>
+cd <repo>
+task deploy_gitlab
+```
+Описание доступных task команд:
+```console
+task
+```
+
+4. Процесс разворачивания стенда
+- terraform создает ВМ в YC согласно настроенным tfvars
+- terraform создает dynamic inventory файл для ansible
+- запускается ansible playbook, который устанавливает: gitlab (omni, docker compose), gitlab-runner, helm, docker engine, инициализирует YC Kubernetes.
+ 
+Для успешной инициализации YC необходимо поместить в папку ansible/playbooks/files кофигурационные файлы для YC и kubectl.
+
+5. Доступ к интерфейсу gitlab 
+
+На ВМ выполнить команду. Команда выведет временный пароль для доступа к gitlab
+
+```console
+sudo docker exec -it <gitlab_docker_image_hash> cat /etc/gitlab/initial_root_password
+```
+
+6. Установка Grafana Prometheus Loki Stack
+
+Установка стека мониторинга производится при помощи helm. Необходимые манифесты для установки находятся в папке ./helm
+
+```console
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+kubectl create namespace monitoring
+helm install kube-prom-stack prometheus-community/kube-prometheus-stack -n monitoring -f helm/kube-prometheus-stack/values.yaml
+kubectl apply -f helm/kube-prometheus-stack/ingress_grafana.yaml
+kubectl apply -f helm/kube-prometheus-stack/prometheus_app_service_monitor.yaml
+```
+
+В файле ingress_grafana.yaml необходимо заменить IP адрес хоста на релевантный адрес kubernetes load balancer.
 
  helm upgrade --install --namespace monitoring logging grafana/loki -f helm/kube-prometheus-stack/values_minio.yaml --set loki.auth_enabled=false --set loki.useTestSchema=true
